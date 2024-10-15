@@ -6,10 +6,13 @@ import { orderBookRouter } from "./routes/orderBook";
 import { balancesDataRouter } from "./routes/balance";
 import { onRampRouter } from "./routes/onRamp";
 import { createMintRouter } from "./routes/createMint";
+import bodyParser from "body-parser";
 
 const app = express();
 
 app.use(express.json());
+app.use(bodyParser.json());
+
 
 app.get('/', (req, res) => {
     res.send("Options Trading App");

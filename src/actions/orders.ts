@@ -1,45 +1,86 @@
-import { INR_BALANCES, ORDERBOOK } from "../db";
+import { INR_BALANCES, ORDERBOOK } from '../db';
 import { Request, Response } from 'express';
 
-const processOrder = (req:Request, res:Response) => {
-    try {
-        const { userId, stockSymbol, quantity, price } = req.body;
-
-        // Calculate the 'no' price based on the input price
-        const noPrice = (10 - parseInt(price)).toString();
-        const quantityInt = parseInt(quantity);
-
-        // Check if there's already an order for 'no' at the calculated price
-        if (ORDERBOOK[stockSymbol]['no'].hasOwnProperty(noPrice)) {
-            // Update the existing order for 'no' by the user
-            ORDERBOOK[stockSymbol]['no'][noPrice]['orders'][userId] = 
-                (ORDERBOOK[stockSymbol]['no'][noPrice]['orders'][userId] || 0) + quantityInt;
-            
-            // Update the total quantity of 'no' orders
-            ORDERBOOK[stockSymbol]['no'][noPrice]['total'] += quantityInt;
-        } else {
-            // Create a new order entry for 'no' if it doesn't exist
-            ORDERBOOK[stockSymbol]['no'][noPrice] = {
-                total: quantityInt,
-                orders: {
-                    [userId]: quantityInt,
-                }
-            };
-        }
-
-        // Calculate the cost and update the user's INR balance
-        const cost = parseInt(price) * quantityInt;
-        INR_BALANCES[userId]['balance'] -= cost;
-        INR_BALANCES[userId]['locked'] += cost;
-
-        // Return a success response
-        return { success: true };
-    } catch (error) {
-        console.error("Error processing the order:", error);
-        return { success: false, message: 'An error occurred while processing your order.' };
-    }
+const checkBalance = (userId: string, amount: number) => {
+    const userBalance = INR_BALANCES[userId];
+    return userBalance && userBalance.balance >= amount;
 };
 
-// Example of how you might call this function in the future
-// const result = processOrder(req);
-// res.status(result.success ? 200 : 500).send(result);
+ export const buyYesOption = async (req: Request, res: Response) => {
+    const { userId, stockSymbol, quantity, price } = req.body;
+    const totalCost = quantity * price;
+
+    if (!checkBalance(userId, totalCost)) {
+        return res.status(400).json({ error: 'Insufficient balance.' });
+    }
+
+    INR_BALANCES[userId].balance -= totalCost;
+
+    if (!ORDERBOOK[stockSymbol]) {
+        ORDERBOOK[stockSymbol] = { yes: {}, no: {} };
+    }
+
+    if (!ORDERBOOK[stockSymbol].yes[price.toString()]) {
+        ORDERBOOK[stockSymbol].yes[price.toString()] = { total: 0, orders: {} };
+    }
+
+    ORDERBOOK[stockSymbol].yes[price.toString()].total += quantity;
+    ORDERBOOK[stockSymbol].yes[price.toString()].orders[userId] = 
+        (ORDERBOOK[stockSymbol].yes[price.toString()].orders[userId] || 0) + quantity;
+
+    return res.status(200).json({ message: 'Yes option bought successfully.' });
+};
+
+
+
+export const buyNoOption = async (req:Request, res:Response) => {
+    const {userId,stockSymbol,quantity,price} = req.body;   
+    const totalCost = quantity * price;
+
+
+    if(!checkBalance(userId,totalCost)) {
+        return res.status(400).json({
+            error:"Insufficient balance"    
+        })
+
+    }
+    INR_BALANCES[userId].balance -= totalCost;
+
+    if(!ORDERBOOK[stockSymbol]) {
+        ORDERBOOK[stockSymbol] = {yes:{}, no : {}};
+    }
+}
+
+
+
+
+//////wrtiting the sell yes option
+
+export const sellYesOption = async (req: Request, res: Response) => {
+    const { userId, stockSymbol, quantity, price } = req.body;
+
+    if (!ORDERBOOK[stockSymbol] || !ORDERBOOK[stockSymbol].yes[price.toString()] || !ORDERBOOK[stockSymbol].yes[price.toString()].orders[userId]) {
+        return res.status(400).json({ error: 'No such Yes option found for the user.' });
+    }
+
+    const userQuantity = ORDERBOOK[stockSymbol].yes[price.toString()].orders[userId];
+
+    if (userQuantity < quantity) {
+        return res.status(400).json({ error: 'Insufficient Yes options to sell.' });
+    }
+
+    // Deduct the quantity being sold
+    ORDERBOOK[stockSymbol].yes[price.toString()].orders[userId] -= quantity;
+    ORDERBOOK[stockSymbol].yes[price.toString()].total -= quantity;
+
+    // If the user's quantity is zero, remove the order entry
+    if (ORDERBOOK[stockSymbol].yes[price.toString()].orders[userId] === 0) {
+        delete ORDERBOOK[stockSymbol].yes[price.toString()].orders[userId];
+    }
+
+    // Add the funds back to the user's balance
+    const totalProceeds = quantity * price;
+    INR_BALANCES[userId].balance += totalProceeds;
+
+    return res.status(200).json({ message: 'Yes option sold successfully.' });
+};
