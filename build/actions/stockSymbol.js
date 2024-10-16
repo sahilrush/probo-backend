@@ -18,13 +18,11 @@ const createSymbol = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             res.status(400).json({
                 msg: "Symbol Required"
             });
-            return;
         }
         if (db_1.STOCK_SYMBOLS[stockSymbol]) {
             res.status(400).json({
                 msg: "Symbol is Already taken"
             });
-            return;
         }
         db_1.STOCK_SYMBOLS[stockSymbol] = { stockSymbol };
         res.status(200).json({

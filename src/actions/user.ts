@@ -6,7 +6,8 @@ export const createUser = async (req: Request, res: Response) => {
 
   try {
     if (USERS[userId]) {
-       res.status(409).json({ error: 'User already exists' });
+        res.status(409).json({ error: 'User already exists' });
+        return;
     }
 
     USERS[userId] = { userId }; 

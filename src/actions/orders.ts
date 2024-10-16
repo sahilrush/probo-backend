@@ -14,6 +14,7 @@ const checkBalance = (userId: string, amount: number) => {
         return res.status(400).json({ error: 'Insufficient balance.' });
     }
 
+    
     INR_BALANCES[userId].balance -= totalCost;
 
     if (!ORDERBOOK[stockSymbol]) {

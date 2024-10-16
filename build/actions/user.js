@@ -16,6 +16,7 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         if (db_1.USERS[userId]) {
             res.status(409).json({ error: 'User already exists' });
+            return;
         }
         db_1.USERS[userId] = { userId };
         db_1.INR_BALANCES[userId] = { balance: 0, locked: 0 };

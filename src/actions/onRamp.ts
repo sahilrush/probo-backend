@@ -11,17 +11,19 @@ export const onRamp = async(req:Request, res:Response) => {
                     error:"User not found"
                 })
             }
-            const amount_Rs = amount/1000
+            const amount_Rs = amount/100;
             if(amount_Rs<0){
                 res.status(400).json({
                     error:"invalid amount"
                 })
-                balance[userId].balance+=amount_Rs
-                res.status(200).json({
-                    message: `${amount_Rs} addded succesfully`, data:balance[userId]
-                })
+               
             }
+            balance[userId].balance+=amount_Rs
+            res.status(200).json({
+                message: `${amount_Rs} addded succesfully`, data:balance[userId]
+            })
     }catch(error) {
+        console.log(error);
         res.status(500).json({
             error:"unexpected error"
         })

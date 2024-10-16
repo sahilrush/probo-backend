@@ -7,4 +7,4 @@ exports.onRampRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const onRamp_1 = require("../actions/onRamp");
 exports.onRampRouter = express_1.default.Router();
-exports.onRampRouter.post('/onramp/inr', onRamp_1.onRamp);
+exports.onRampRouter.post('/inr', onRamp_1.onRamp);

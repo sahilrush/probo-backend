@@ -4,7 +4,7 @@ import { getBalance, getBalanceAll, getStockBalance, getStockBalanceAll } from "
 
 
 export const balancesDataRouter = express.Router();
-balancesDataRouter.get('/balances/inr/:userId', getBalance )
-balancesDataRouter.get('/balances/inr', getBalanceAll)
-balancesDataRouter.get('/balances/stock/:userId' ,getStockBalance)
-balancesDataRouter.get('/balances/stock', getStockBalanceAll)
+balancesDataRouter.get('/inr/:userId', getBalance )
+balancesDataRouter.get('/inr', getBalanceAll)
+balancesDataRouter.get('/stock/:userId' ,getStockBalance)
+balancesDataRouter.get('/stock', getStockBalanceAll)

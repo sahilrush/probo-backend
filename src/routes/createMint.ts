@@ -4,4 +4,4 @@ import { createMint } from "../actions/createMint";
 
 export const createMintRouter = express.Router()
 
-createMintRouter.post('' ,createMint);
+createMintRouter.post('' );

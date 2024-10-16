@@ -13,8 +13,10 @@ export const getBalance = async (req: Request, res: Response) => {
   }
 }
 
+
 export const getBalanceAll = async(req:Request , res: Response) => {
     try{
+        
         res.status(200).json({
             data:INR_BALANCES
         })

@@ -8,14 +8,13 @@ export const createSymbol = async (req: Request, res: Response) => {
             res.status(400).json({
                 msg: "Symbol Required" 
             });
-            return; 
         }
 
         if (STOCK_SYMBOLS[stockSymbol]) {
             res.status(400).json({
                 msg: "Symbol is Already taken" 
             });
-            return;
+
         }
 
         STOCK_SYMBOLS[stockSymbol] = { stockSymbol }; 
@@ -23,6 +22,7 @@ export const createSymbol = async (req: Request, res: Response) => {
             msg: `${stockSymbol} has been created`, 
             data: STOCK_SYMBOLS[stockSymbol] 
         });
+        return;
 
     } catch (error) {
         res.status(500).json({
